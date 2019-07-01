@@ -22,6 +22,7 @@ class MainActivity : AppCompatActivity() {
         sharedQueue = LinkedBlockingQueue()
         executor = Executors.newCachedThreadPool()
         producer()
+        consumer()
     }
 
     fun producer() {
@@ -44,6 +45,32 @@ class MainActivity : AppCompatActivity() {
             }
         }
         executor!!.execute(producerTask)
+
+    }
+
+    fun consumer() {
+
+        consumerTask = Runnable {
+            try {
+                while (!Thread.currentThread().isInterrupted) {
+                    val value = sharedQueue.take() as Int
+                    Log.i("Consumer", value.toString())
+                    Thread.sleep(2000)
+
+
+                }
+            } catch (e: InterruptedException) {
+                e.printStackTrace()
+                Thread.currentThread().interrupt()
+            }
+        }
+        executor!!.execute(consumerTask)
+    }
+
+
+    override fun onDestroy() {
+        super.onDestroy()
+        executor!!.shutdownNow()
 
     }
 
